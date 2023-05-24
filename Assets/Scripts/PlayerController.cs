@@ -17,15 +17,25 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame  
     void Update()
     {
+        Aim();
         MovePlayer();
         KeepPlayerInBounds();
     }
 
+    private void Aim()
+    {
+        Vector3 lookDirection = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        // Determine which direction to rotate towards
+        Vector3 targetDirection = (lookDirection - transform.position);
+        Debug.DrawRay(transform.position, targetDirection, Color.red);
+    }
     private void MovePlayer()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
         float verticalInput = Input.GetAxis("Vertical");
 
+        
         transform.Translate(speed * verticalInput * Time.deltaTime * Vector3.forward);
         transform.Translate(speed * horizontalInput * Time.deltaTime * Vector3.right);
     }
