@@ -4,9 +4,12 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private readonly float speed = 10f;
-    private readonly float zBound = 7.5f;
-    private readonly float xBound = 15f;
+    private readonly float speed = 15f;
+    private readonly float xBound = 22f;
+    private readonly float fireCooldown = 0.33f;
+    private float currentFireCooldown = 0.0f;
+
+    public GameObject projectile;
 
     // Start is called before the first frame update
     void Start()
@@ -17,40 +20,21 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame  
     void Update()
     {
-        Aim();
         MovePlayer();
         KeepPlayerInBounds();
+        Fire();
     }
 
-    private void Aim()
-    {
-        Vector3 lookDirection = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-        // Determine which direction to rotate towards
-        Vector3 targetDirection = (lookDirection - transform.position);
-        Debug.DrawRay(transform.position, targetDirection, Color.red);
-    }
     private void MovePlayer()
     {
         float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
 
-        
-        transform.Translate(speed * verticalInput * Time.deltaTime * Vector3.forward);
         transform.Translate(speed * horizontalInput * Time.deltaTime * Vector3.right);
     }
 
     private void KeepPlayerInBounds()
     {
-        if (transform.position.z > zBound)
-        {
-            transform.position = new Vector3(transform.position.x, transform.position.y, zBound);
-        }
-
-        if (transform.position.z < -zBound)
-        {
-            transform.position = new Vector3(transform.position.x, transform.position.y, -zBound);
-        }
 
         if (transform.position.x > xBound)
         {
@@ -60,6 +44,20 @@ public class PlayerController : MonoBehaviour
         if (transform.position.x < -xBound)
         {
             transform.position = new Vector3(-xBound, transform.position.y, transform.position.z);
+        }
+    }
+
+    private void Fire()
+    {
+        if(currentFireCooldown > 0.0f)
+        {
+            currentFireCooldown -= Time.deltaTime;
+        }
+
+        if (Input.GetKey(KeyCode.Space) && currentFireCooldown <= 0.0f) 
+        {
+            Instantiate(projectile, transform.position, projectile.transform.rotation);
+            currentFireCooldown = fireCooldown;
         }
     }
 }
