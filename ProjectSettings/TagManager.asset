@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Sensor
   - Player Bullet
+  - Asteroid
   layers:
   - Default
   - TransparentFX
