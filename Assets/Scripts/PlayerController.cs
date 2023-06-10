@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    private GameManager gameManager;
     private readonly float speed = 15f;
     private readonly float xBound = 22f;
     private readonly float fireCooldown = 0.33f;
@@ -14,15 +15,18 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
     // Update is called once per frame  
     void Update()
     {
-        MovePlayer();
-        KeepPlayerInBounds();
-        Fire();
+        if (this.gameManager.isGameActive)
+        {
+            MovePlayer();
+            KeepPlayerInBounds();
+            Fire();
+        }
     }
 
 
@@ -49,15 +53,25 @@ public class PlayerController : MonoBehaviour
 
     private void Fire()
     {
-        if(currentFireCooldown > 0.0f)
+        if (currentFireCooldown > 0.0f)
         {
             currentFireCooldown -= Time.deltaTime;
         }
 
-        if (Input.GetKey(KeyCode.Space) && currentFireCooldown <= 0.0f) 
+        if (Input.GetKey(KeyCode.Space) && currentFireCooldown <= 0.0f)
         {
             Instantiate(projectile, transform.position, projectile.transform.rotation);
             currentFireCooldown = fireCooldown;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Enemy Bullet") || other.CompareTag("Asteroid"))
+        {
+            Destroy(gameObject);
+            Destroy(other.gameObject);
+            this.gameManager.GameOver();
         }
     }
 }

@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class Obstacle : MonoBehaviour
 {
+    private GameManager gameManager;
     // Start is called before the first frame update
     void Start()
     {
-        
+        this.gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
     // Update is called once per frame
@@ -27,6 +28,7 @@ public class Obstacle : MonoBehaviour
         {
             Destroy(other.gameObject);
             Destroy(gameObject);
+            this.gameManager.UpdateScore(5);
         }
     }
 }

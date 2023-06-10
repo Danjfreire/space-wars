@@ -9,6 +9,7 @@ public class Enemy : MonoBehaviour
     private float speed = 5.0f;
     private float fireCooldown = 1.0f;
     private float currentFireCooldown = 0.0f;
+    private GameManager gameManager;
 
     public GameObject projectilePrefab;
 
@@ -16,13 +17,17 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         player = GameObject.Find("Player");
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        moveToPosition();
-        FireAtPlayer();
+        if (this.gameManager.isGameActive)
+        {
+            moveToPosition();
+            FireAtPlayer();
+        }
     }
 
     private void moveToPosition()
@@ -61,6 +66,7 @@ public class Enemy : MonoBehaviour
         {
             Destroy(other.gameObject);
             Destroy(gameObject);
+            gameManager.UpdateScore(10);
         }
     }
 }
