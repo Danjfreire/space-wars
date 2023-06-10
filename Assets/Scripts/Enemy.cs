@@ -25,6 +25,7 @@ public class Enemy : MonoBehaviour
     {
         if (this.gameManager.isGameActive)
         {
+            Debug.Log("Game is Active");
             moveToPosition();
             FireAtPlayer();
         }
