@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     private readonly float fireCooldown = 0.33f;
     private float currentFireCooldown = 0.0f;
 
+    public Transform projectileSpawnPosition;
     public GameObject projectile;
 
     // Start is called before the first frame update
@@ -34,7 +35,7 @@ public class PlayerController : MonoBehaviour
     {
         float horizontalInput = Input.GetAxis("Horizontal");
 
-        transform.Translate(speed * horizontalInput * Time.deltaTime * Vector3.right);
+        transform.Translate(speed * horizontalInput * Time.deltaTime * transform.TransformDirection(Vector3.right));
     }
 
     private void KeepPlayerInBounds()
@@ -60,7 +61,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Space) && currentFireCooldown <= 0.0f)
         {
-            Instantiate(projectile, transform.position, projectile.transform.rotation);
+            Instantiate(projectile, projectileSpawnPosition.position, projectile.transform.rotation);
             currentFireCooldown = fireCooldown;
         }
     }

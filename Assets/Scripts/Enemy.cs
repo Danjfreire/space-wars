@@ -16,7 +16,7 @@ public class Enemy : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        player = GameObject.Find("Player");
+        player = GameObject.Find("PlayerCenter");
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
@@ -46,6 +46,7 @@ public class Enemy : MonoBehaviour
     private void FireAtPlayer()
     {
         Vector3 playerPos = player.transform.position;
+        Debug.Log(playerPos.x);
         transform.LookAt(playerPos);
 
         if (currentFireCooldown > 0.0f)
