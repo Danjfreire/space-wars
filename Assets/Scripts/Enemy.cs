@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +11,8 @@ public class Enemy : MonoBehaviour
     private float fireCooldown = 1.0f;
     private float currentFireCooldown = 0.0f;
     private GameManager gameManager;
+    private SpawnManager spawnManager;
+    private bool atPosition = false;
 
     public GameObject projectilePrefab;
 
@@ -18,6 +21,7 @@ public class Enemy : MonoBehaviour
     {
         player = GameObject.Find("PlayerCenter");
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        spawnManager = GameObject.Find("SpawnManager").GetComponent<SpawnManager>();
     }
 
     // Update is called once per frame
@@ -25,7 +29,6 @@ public class Enemy : MonoBehaviour
     {
         if (this.gameManager.isGameActive)
         {
-            Debug.Log("Game is Active");
             moveToPosition();
             FireAtPlayer();
         }
@@ -40,13 +43,18 @@ public class Enemy : MonoBehaviour
         else
         {
             transform.position = new Vector3(transform.position.x, transform.position.y, zPosition);
+            atPosition = true;
         }
     }
 
     private void FireAtPlayer()
     {
+        if(!atPosition)
+        {
+            return;
+        }
+
         Vector3 playerPos = player.transform.position;
-        Debug.Log(playerPos.x);
         transform.LookAt(playerPos);
 
         if (currentFireCooldown > 0.0f)
@@ -66,9 +74,11 @@ public class Enemy : MonoBehaviour
     {
         if (other.CompareTag("Player Bullet"))
         {
+            spawnManager.FreeSpawnAtPosition((int)Math.Floor(transform.position.x));
             Destroy(other.gameObject);
             Destroy(gameObject);
             gameManager.UpdateScore(10);
         }
+
     }
 }

@@ -1,69 +1,80 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class SpawnManager : MonoBehaviour
 {
-    private float arenaRangeX = 22.0f;
+    private int arenaRangeX = 22;
+    private int enemySpacing = 2;
     private float spawnPosZ = 5.0f;
     private float spawnPosY = 0.5f;
     private float enemySpawnRate = 4;
     private float obstacleSpawnRate = 3;
     private GameManager gameManager;
+    private List<int> spawnxPositions = new List<int>();
+    private List<bool> availableSpawnPositions = new List<bool>();
 
+    public GameObject[] spawnPositions;
     public GameObject enemyPrefab;
     public GameObject obstaclePrefab;
 
+ 
     // Start is called before the first frame update
     void Start()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        //InvokeRepeating(nameof(SpawnRandomEnemy), 2, 5);
-        //InvokeRepeating(nameof(SpawnRandomObstacle), 1, 3);
     }
 
     public void StartSpawning()
     {
-        StartCoroutine(SpawnEnemy());
-        StartCoroutine(SpawnObstacle());
+        InitializeSpawnPositions();
+
+        StartCoroutine(Spawn(enemyPrefab, enemySpawnRate));
+        StartCoroutine(Spawn(obstaclePrefab, obstacleSpawnRate));
     }
 
-    IEnumerator SpawnEnemy()
+    private void InitializeSpawnPositions()
     {
-        while(gameManager.isGameActive)
+        for (int i = -arenaRangeX; i < arenaRangeX; i += enemySpacing)
         {
-            yield return new WaitForSeconds(enemySpawnRate);
-            SpawnRandomEnemy();
+            spawnxPositions.Add(i);
+            availableSpawnPositions.Add(true);
         }
     }
 
-    IEnumerator SpawnObstacle()
+    public void FreeSpawnAtPosition(int xPosition)
+    {
+        int index = spawnxPositions.IndexOf(xPosition);
+        //Debug.Log("Position : " + xPosition + " | " +"Index : " + index);
+        availableSpawnPositions[index] = true;
+    }
+
+    IEnumerator Spawn(GameObject obj, float spawnRate)
     {
         while (gameManager.isGameActive)
         {
-            yield return new WaitForSeconds(obstacleSpawnRate);
-            SpawnRandomObstacle();
+            yield return new WaitForSeconds(spawnRate);
+            TryToSpawnAtRandomPosition(obj);
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    void TryToSpawnAtRandomPosition(GameObject obj)
     {
-
-    }
-
-    void SpawnRandomObstacle()
-    {
-        Instantiate(obstaclePrefab, GenerateSpawnPosition(), enemyPrefab.transform.rotation);
-    }
-    void SpawnRandomEnemy()
-    {
-        Instantiate(enemyPrefab, GenerateSpawnPosition(), enemyPrefab.transform.rotation);  
-    }
-
-    Vector3 GenerateSpawnPosition()
-    {
-        Vector3 spawnPosition = new Vector3(Random.Range(-arenaRangeX, arenaRangeX), spawnPosY, spawnPosZ);
-        return spawnPosition;
+        int tries = 0;
+        while (tries < 3)
+        {
+            int spawnIndex = UnityEngine.Random.Range(0, spawnxPositions.Count);
+            if (availableSpawnPositions[spawnIndex])
+            {
+               Instantiate(
+                    obj,
+                    new Vector3(spawnxPositions[spawnIndex], spawnPosY, spawnPosZ), 
+                    obj.transform.rotation);
+                availableSpawnPositions[spawnIndex] = false;
+                return;
+            }
+            tries++;
+        }
     }
 }
